@@ -74,7 +74,7 @@ function checkIfWordIsReal(word) {
     // make an AJAX call to the Pearson API
     $.ajax({
         // TODO 13 what should the url be?
-        url: "www.todo13.com",
+        url: "http://api.pearson.com/v2/dictionaries/lasde/entries?headword=" + word,
         success: function(response) {
             console.log("We received a response from Pearson!");
 
@@ -85,7 +85,20 @@ function checkIfWordIsReal(word) {
             // Replace the 'true' below.
             // If the response contains any results, then the word is legitimate.
             // Otherwise, it is not.
-            var theAnswer = true;
+
+            var theAnswer = response.results;
+            if (theAnswer.length > 0) {
+              console.log("this is a real word")              
+            }
+            // if (response.results.length > 0) {
+            //   theAnswer = true;
+            //   console.log("this is a real word")
+            // }
+            // else {
+            //   theAnswer = false;
+            //   console.log("Not a word")
+            // }
+            //
 
             // TODO 15
             // Update the corresponding wordSubmission in the model
@@ -312,7 +325,10 @@ function disallowedLettersInWord(word) {
 function containsOnlyAllowedLetters(word) {
     // TODO 12
     // Return the actual answer.
-    return true;
+    if (letters.filter(isDisallowedLetter) >= 0) {
+      return true;
+    };
+
 }
 
 /**
