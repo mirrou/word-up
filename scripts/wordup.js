@@ -11,7 +11,6 @@ var model = {
 
     // how much time is left in the current game
     secondsRemaining: GAME_DURATION,
-
     // a list of the 7 letters that the player is allowed to use
     allowedLetters: [],
 
@@ -53,7 +52,17 @@ function addNewWordSubmission(word) {
     // Do we already have a wordSubmission with this word?
     // TODO 21
     // replace the hardcoded 'false' with the real answer
+
+    // using .filter
+    // var alreadyUsed = model.wordSubmissions.filter(function (submission)  {
+    //   return submission.word == word
+    // });
     var alreadyUsed = false;
+    model.wordSubmissions.forEach(function(submission) {
+        if (submission.word == word) {
+            alreadyUsed = true;
+            }
+        });
 
     // if the word is valid and hasn't already been used, add it
     if (containsOnlyAllowedLetters(word) && alreadyUsed == false) {
@@ -85,24 +94,21 @@ function checkIfWordIsReal(word) {
             // Replace the 'true' below.
             // If the response contains any results, then the word is legitimate.
             // Otherwise, it is not.
-
-            var theAnswer = response.results;
-            if (theAnswer.length > 0) {
-              console.log("this is a real word")              
+            var theAnswer = (response.results.length > 0);
+            if (theAnswer){
+              console.log("this is a word");
             }
-            // if (response.results.length > 0) {
-            //   theAnswer = true;
-            //   console.log("this is a real word")
-            // }
-            // else {
-            //   theAnswer = false;
-            //   console.log("Not a word")
-            // }
-            //
+            else {
+              console.log("not a word");
+            }
 
             // TODO 15
             // Update the corresponding wordSubmission in the model
-
+              model.wordSubmissions.forEach(function(submission) {
+               if (submission.word == word) {
+                   submission.isRealWord = theAnswer;
+               }
+           });
 
             // re-render
             render();
@@ -224,12 +230,22 @@ function wordSubmissionChip(wordSubmission) {
         var scoreChip = $("<span></span>").text("⟐");
         // TODO 17
         // give the scoreChip appropriate text content
+        if (wordSubmission.isRealWord === true) {
+          $(scoreChip).text(wordScore(wordSubmission.word))
+          .attr("class", "tag tag-sm tag-primary");
+        }
+        else {
+           $(scoreChip).text("X")
+           .attr("class", "tag tag-sm tag-danger");
+       }
 
-        // TODO 18
+        // TODO 18 (done above)
         // give the scoreChip appropriate css classes
 
         // TODO 16
         // append scoreChip into wordChip
+        wordChip.append(scoreChip)
+
 
     }
 
@@ -289,6 +305,7 @@ $(document).ready(function() {
 
 // borrowing Scrabble's point system
 var scrabblePointsForEachLetter = {
+
     a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1, j: 8, k: 5, l: 1, m: 3,
     n: 1, o: 1, p: 3, q: 10, r: 1, s: 1, t: 1, u: 1, v: 4, w: 4, x: 8, y: 4, z: 10
 }
@@ -359,7 +376,7 @@ function wordScore(word) {
     // TODO 19
     // Replace the empty list below.
     // Map the list of letters into a list of scores, one for each letter.
-    var letterScores = [];
+    var letterScores = $.map(letters,letterScore);
 
     // return the total sum of the letter scores
     return letterScores.reduce(add, 0);
@@ -383,10 +400,8 @@ function currentScore() {
 
     // TODO 20
     // return the total sum of the word scores
-    return 0;
+    return wordScores.reduce(add,0);
 }
-
-
 // ----------------- UTILS -----------------
 
 /**
